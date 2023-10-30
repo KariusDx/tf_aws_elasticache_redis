@@ -1,187 +1,110 @@
-/*
-# These vars would be used by cloudwatch.tf and should be uncommented if we decide to use them.
-variable "alarm_cpu_threshold" {
-  default = "75"
+variable "name" {
+  description = "The name of the redis cluster"
+  type        = string
 }
 
-variable "alarm_memory_threshold" {
-  # 10MB
-  default = "10000000"
+variable "environment" {
+  description = "How do you want to call your environment"
+  type        = string
 }
-
-variable "alarm_actions" {
-  type = "list"
-}
-*/
 
 variable "project" {
   description = "The project this redis cluster belongs to"
   type        = string
 }
 
-variable "parameter_group_name" {
-  description = "The parameter group name"
-  default     = "default.redis7"
+variable "node_type" {
+  description = "The instance size of the redis cluster"
   type        = string
 }
 
-variable "apply_immediately" {
-  description = "Specifies whether any modifications are applied immediately, or during the next maintenance window. Default is false."
-  type        = bool
-  default     = false
-}
-
-variable "allowed_cidr" {
-  description = "A list of Security Group ID's to allow access to."
-  type        = list(string)
-  default     = ["127.0.0.1/32"]
-}
-
-variable "allowed_security_groups" {
-  description = "A list of Security Group ID's to allow access to."
-  type        = list(string)
-  default     = []
-}
-
-variable "env" {
-  description = "env to deploy into, should typically dev/staging/prod"
-  type        = string
-}
-
-variable "name" {
-  description = "Name for the Redis replication group i.e. UserObject"
-  type        = string
-}
-
-variable "redis_clusters" {
-  description = "Number of Redis cache clusters (nodes) to create"
-  type        = string
-}
-
-variable "redis_failover" {
-  type    = bool
-  default = false
-}
-
-variable "multi_az_enabled" {
-  type    = bool
-  default = false
-}
-
-variable "redis_node_type" {
-  description = "Instance type to use for creating the Redis cache clusters"
-  type        = string
-  default     = "cache.m3.medium"
-}
-
-variable "redis_port" {
-  type    = number
-  default = 6379
+variable "num_cache_nodes" {
+  description = "The number of cache nodes"
+  type        = number
 }
 
 variable "subnets" {
+  description = "The subnets where the redis cluster is deployed"
   type        = list(string)
-  description = "List of VPC Subnet IDs for the cache subnet group"
 }
 
-# might want a map
-variable "redis_version" {
-  description = "Redis version to use, defaults to 3.2.10"
-  type        = string
-  default     = "3.2.10"
+variable "allowed_sgs" {
+  description = "The security group that can access the redis cluster"
+  type        = list(string)
 }
 
 variable "vpc_id" {
-  description = "VPC ID"
+  description = "The vpc where we will put the redis cluster"
   type        = string
 }
 
-variable "redis_parameters" {
-  description = "additional parameters modifyed in parameter group"
-  type        = list(map(any))
-  default     = []
-}
-
-variable "redis_maintenance_window" {
-  description = "Specifies the weekly time range for when maintenance on the cache cluster is performed. The format is ddd:hh24:mi-ddd:hh24:mi (24H Clock UTC). The minimum maintenance window is a 60 minute period"
+variable "parameter_group_name" {
+  description = "The parameter group name"
+  default     = "default.redis6.x"
   type        = string
-  default     = "fri:08:00-fri:09:00"
 }
 
-variable "redis_snapshot_window" {
-  description = "The daily time range (in UTC) during which ElastiCache will begin taking a daily snapshot of your cache cluster. The minimum snapshot window is a 60 minute period"
+variable "engine_version" {
+  description = "The redis engine version"
+  default     = "6.x"
   type        = string
-  default     = "06:30-07:30"
 }
 
-variable "redis_snapshot_retention_limit" {
-  description = "The number of days for which ElastiCache will retain automatic cache cluster snapshots before deleting them. For example, if you set SnapshotRetentionLimit to 5, then a snapshot that was taken today will be retained for 5 days before being deleted. If the value of SnapshotRetentionLimit is set to zero (0), backups are turned off. Please note that setting a snapshot_retention_limit is not supported on cache.t1.micro or cache.t2.* cache nodes"
+variable "port" {
+  description = "The redis port"
+  default     = 6379
   type        = number
-  default     = 0
 }
 
-variable "tags" {
-  description = "Tags for redis nodes"
-  type        = map(string)
-  default     = {}
-}
-
-variable "auto_minor_version_upgrade" {
-  description = "Specifies whether a minor engine upgrades will be applied automatically to the underlying Cache Cluster instances during the maintenance window"
-  type        = bool
-  default     = true
+variable "automatic_failover_enabled" {
+  default = false
+  type    = bool
 }
 
 variable "availability_zones" {
-  description = "A list of EC2 availability zones in which the replication group's cache clusters will be created. The order of the availability zones in the list is not important"
+  description = "the list of AZs where you want your cluster to be deployed in"
+  type        = list(string)
+}
+
+variable "snapshot_window" {
+  description = "The daily time range (in UTC) during which ElastiCache will begin taking a daily snapshot of your cache cluster. The minimum maintenance window is a 60 minute period. Example: 05:00-09:00"
+  default     = "03:00-05:00"
+  type        = string
+}
+
+variable "snapshot_retention_limit" {
+  description = "The number of days for which ElastiCache will retain automatic cache cluster snapshots before deleting them. For example, if you set SnapshotRetentionLimit to 5, then a snapshot that was taken today will be retained for 5 days before being deleted. If the value of SnapshotRetentionLimit is set to zero (0), backups are turned off. Please note that setting a snapshot_retention_limit is not supported on cache.t1.micro or cache.t2.* cache nodes"
+  default     = 0
+  type        = number
+}
+
+variable "snapshot_arns" {
+  description = "(Optional) A single-element string list containing an Amazon Resource Name (ARN) of a Redis RDB snapshot file stored in Amazon S3. Example: arn:aws:s3:::my_bucket/snapshot1.rdb"
   type        = list(string)
   default     = []
 }
 
 variable "at_rest_encryption_enabled" {
-  description = "Whether to enable encryption at rest"
+  description = "(Optional) Whether to enable encryption at rest"
+  default     = true
   type        = bool
-  default     = false
-}
-
-variable "kms_key_id" {
-  description = "The ARN of the key that you wish to use if encrypting at rest. If not supplied, uses service managed encryption. Can be specified only if at_rest_encryption_enabled = true"
-  type        = string
-  default     = ""
 }
 
 variable "transit_encryption_enabled" {
-  description = "Whether to enable encryption in transit. Requires 3.2.6 or >=4.0 redis_version"
+  description = "(Optional) Whether to enable encryption in transit"
+  default     = true
   type        = bool
-  default     = false
 }
 
 variable "auth_token" {
-  description = "The password used to access a password protected server. Can be specified only if transit_encryption_enabled = true. If specified must contain from 16 to 128 alphanumeric characters or symbols"
-  type        = string
+  description = "(Optional) The password used to access a password protected server. Can be specified only if `transit_encryption_enabled = true`"
   default     = null
-}
-
-variable "security_group_names" {
-  description = "A list of cache security group names to associate with this replication group"
-  type        = list(string)
-  default     = []
-}
-
-variable "snapshot_arns" {
-  description = "A single-element string list containing an Amazon Resource Name (ARN) of a Redis RDB snapshot file stored in Amazon S3. Example: arn:aws:s3:::my_bucket/snapshot1.rdb"
-  type        = list(string)
-  default     = []
-}
-
-variable "snapshot_name" {
-  description = " The name of a snapshot from which to restore data into the new node group. Changing the snapshot_name forces a new resource"
   type        = string
-  default     = ""
 }
+
 
 variable "notification_topic_arn" {
-  description = "An Amazon Resource Name (ARN) of an SNS topic to send ElastiCache notifications to. Example: arn:aws:sns:us-east-1:012345678999:my_sns_topic"
+  description = "(Optional) ARN of an SNS topic to send ElastiCache notifications"
+  default     = null
   type        = string
-  default     = ""
 }

@@ -1,30 +1,23 @@
-resource "aws_security_group" "redis_security_group" {
-  name        = "sg_${var.name}_${var.project}_${var.env}"
+# Create redis security group
+resource "aws_security_group" "sg_redis" {
+  name        = "sg_${var.name}_${var.project}_${var.environment}"
   description = "Security group that is needed for the ${var.name} servers"
-  vpc_id      = data.aws_vpc.vpc.id
+  vpc_id      = var.vpc_id
 
   tags = {
-    Name        = "${var.project}-${var.env}-sg_${var.name}"
-    Environment = var.env
+    Name        = "${var.project}-${var.environment}-sg_${var.name}"
+    Environment = var.environment
     Project     = var.project
   }
 }
 
-resource "aws_security_group_rule" "redis_ingress" {
-  count                    = length(var.allowed_security_groups)
+# Allow a security group to access the redis instance
+resource "aws_security_group_rule" "sg_app_to_redis" {
+  count                    = length(var.allowed_sgs)
   type                     = "ingress"
-  from_port                = var.redis_port
-  to_port                  = var.redis_port
+  security_group_id        = aws_security_group.sg_redis.id
+  from_port                = var.port
+  to_port                  = var.port
   protocol                 = "tcp"
-  source_security_group_id = element(var.allowed_security_groups, count.index)
-  security_group_id        = aws_security_group.redis_security_group.id
-}
-
-resource "aws_security_group_rule" "redis_networks_ingress" {
-  type              = "ingress"
-  from_port         = var.redis_port
-  to_port           = var.redis_port
-  protocol          = "tcp"
-  cidr_blocks       = var.allowed_cidr
-  security_group_id = aws_security_group.redis_security_group.id
+  source_security_group_id = var.allowed_sgs[count.index]
 }
