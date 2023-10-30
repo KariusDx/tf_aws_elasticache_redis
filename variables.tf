@@ -40,13 +40,13 @@ variable "vpc_id" {
 
 variable "parameter_group_name" {
   description = "The parameter group name"
-  default     = "default.redis6.x"
+  default     = "default.redis7"
   type        = string
 }
 
 variable "engine_version" {
   description = "The redis engine version"
-  default     = "6.x"
+  default     = "7.x"
   type        = string
 }
 
