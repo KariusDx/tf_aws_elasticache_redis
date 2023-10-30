@@ -19,6 +19,12 @@ variable "project" {
   type        = string
 }
 
+variable "parameter_group_name" {
+  description = "The parameter group name"
+  default     = "default.redis7"
+  type        = string
+}
+
 variable "apply_immediately" {
   description = "Specifies whether any modifications are applied immediately, or during the next maintenance window. Default is false."
   type        = bool
