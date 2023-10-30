@@ -16,7 +16,7 @@ resource "random_id" "salt" {
 
 resource "aws_elasticache_replication_group" "redis" {
   replication_group_id          = "${var.project}-${var.env}-${var.name}"
-  replication_group_description = "Redis cluster for ${var.project}-${var.environment}-${var.name}"
+  replication_group_description = "Redis cluster for ${var.project}-${var.env}-${var.name}"
   number_cache_clusters         = var.redis_clusters
   node_type                     = var.redis_node_type
   automatic_failover_enabled    = var.redis_failover
@@ -41,7 +41,11 @@ resource "aws_elasticache_replication_group" "redis" {
   notification_topic_arn        = var.notification_topic_arn
   snapshot_window               = var.redis_snapshot_window
   snapshot_retention_limit      = var.redis_snapshot_retention_limit
-  tags                          = merge(tomap({"Name" = format("tf-elasticache-%s-%s", var.name, local.vpc_name)}), var.tags)
+  tags = {
+    Name        = "${var.project}-${var.env}-${var.name}"
+    Environment = var.env
+    Project     = var.name
+  }
 }
 
 resource "aws_elasticache_parameter_group" "redis_parameter_group" {
