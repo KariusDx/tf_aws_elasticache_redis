@@ -15,8 +15,8 @@ resource "random_id" "salt" {
 }
 
 resource "aws_elasticache_replication_group" "redis" {
-  replication_group_id          = format("%.20s", "${var.name}-${var.env}")
-  replication_group_description = "Terraform-managed ElastiCache replication group for ${var.name}-${var.env}-${local.vpc_name}"
+  replication_group_id          = "${var.project}-${var.env}-${var.name}"
+  replication_group_description = "Redis cluster for ${var.project}-${var.environment}-${var.name}"
   number_cache_clusters         = var.redis_clusters
   node_type                     = var.redis_node_type
   automatic_failover_enabled    = var.redis_failover
