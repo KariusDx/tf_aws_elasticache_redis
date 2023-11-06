@@ -46,7 +46,7 @@ variable "parameter_group_name" {
 
 variable "engine_version" {
   description = "The redis engine version"
-  default     = "7.0"
+  default     = "7.0.7"
   type        = string
 }
 
